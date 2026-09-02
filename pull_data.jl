@@ -32,3 +32,11 @@ end
 
 result = find_kanji_level("一")
 println("Ergebnis: ", result)
+
+# read text files from input directory
+input_dir = joinpath(@__DIR__, "input")
+text = String[]
+for file in readdir(input_dir; join=true)
+    push!(text, read(file, String))
+end
+
