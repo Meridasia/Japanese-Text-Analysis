@@ -1,7 +1,7 @@
 using Pkg
 Pkg.add("JSON")
 using JSON
-path = "C:\\Users\\anjas\\Desktop\\project\\Julia_Projekt\\data\\json\\kanji\\n5.json"
+path = joinpath(@__DIR__, "data", "json", "kanji", "n5.json")
 data = JSON.parsefile(path) # liest die JSON-Datei und gibt ein Array von Dictionaries zurück
 
 println(data[1])   # first entry
@@ -11,7 +11,7 @@ println(data[1]["level"])  # level of the first kanji character
 
 using JSON
 
-base_dir = "C:\\Users\\anjas\\Desktop\\project\\Julia_Projekt\\data\\json\\kanji"
+base_dir = joinpath(@__DIR__, "data", "json", "kanji")
 """
 Finds the level of a given kanji character across all JSON files in the specified directory.
 """
