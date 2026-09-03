@@ -12,56 +12,65 @@ println(data[1]["level"])  # level of the first kanji character
 using JSON
 
 base_dir = joinpath(@__DIR__, "data", "json", "kanji")
-"""
-Finds the level of a given kanji character across all JSON files in the specified directory.
-"""
-function find_kanji_level(character::String)
-    for file in readdir(base_dir; join=true) # readdir liest alle Dateien im Verzeichnis; join=true gibt den vollständigen Pfad zurück
+
+function load_kanji_level(directory::String)
+    kanji_levels = Dict{String, String}()
+
+    for file in readdir(directory; join=true)
         data = JSON.parsefile(file)
 
         for entry in data
-            if entry["character"] == character
-                println("Kanji: ", character, " | Level: ", entry["level"])
-                return entry["level"]
-            end
+            kanji_levels[entry["character"]] = entry["level"]
         end
     end
 
-    return nothing
+    return kanji_levels
 end
-find_kanji_level(character) = ""
+
+kanji_levels = load_kanji_level(base_dir)
 
 
-
-result = find_kanji_level("一")
-println("Ergebnis: ", result)
+ get(kanji_levels, "一", "unbekannt")
 
 # read text files from input directory
 input_dir = joinpath(@__DIR__, "input")
 text = String[]
-for file in readdir(input_dir; join=true)
+name = String[]
+results = []
+for file in sort(readdir(input_dir; join=true))
     push!(text, read(file, String))
+    push!(name, splitext(basename(file))[1])
 end
 
 for i in 1:length(text)
-amount_n1 = 0
-amount_n2 = 0
-amount_n3 = 0
-amount_n4 = 0
-amount_n5 = 0
+counts = Dict(
+    "N1" => 0,
+    "N2" => 0,
+    "N3" => 0,
+    "N4" => 0,
+    "N5" => 0
+)
     for j in text[i]
-        level = find_kanji_level(string(j));
-        if level == "N1"
-            amount_n1 += 1
-        elseif level == "N2"
-            amount_n2 += 1
-        elseif level == "N3"
-            amount_n3 += 1
-        elseif level == "N4"
-            amount_n4 += 1
-        elseif level == "N5"
-            amount_n5 += 1
+        level = get(kanji_levels, string(j), "");
+        if level !== ""
+            counts[level] += 1
         end
     end
-write(joinpath(@__DIR__, "output", "result_$(i).txt"), "N1: $amount_n1\nN2: $amount_n2\nN3: $amount_n3\nN4: $amount_n4\nN5: $amount_n5")
+    println("\nDatei ", name[i], ":")
+    println("N1: ", counts["N1"])
+    println("N2: ", counts["N2"])
+    println("N3: ", counts["N3"])
+    println("N4: ", counts["N4"])
+    println("N5: ", counts["N5"])
+
+    results_entry = Dict(
+        "file" => name[i],
+        "N1" => counts["N1"],
+        "N2" => counts["N2"],
+        "N3" => counts["N3"],
+        "N4" => counts["N4"],
+        "N5" => counts["N5"]
+    )
+    push!(results, results_entry)
 end
+
