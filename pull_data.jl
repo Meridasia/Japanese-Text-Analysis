@@ -29,6 +29,9 @@ function find_kanji_level(character::String)
 
     return nothing
 end
+find_kanji_level(character) = ""
+
+
 
 result = find_kanji_level("一")
 println("Ergebnis: ", result)
@@ -40,3 +43,25 @@ for file in readdir(input_dir; join=true)
     push!(text, read(file, String))
 end
 
+for i in 1:length(text)
+amount_n1 = 0
+amount_n2 = 0
+amount_n3 = 0
+amount_n4 = 0
+amount_n5 = 0
+    for j in text[i]
+        level = find_kanji_level(string(j));
+        if level == "N1"
+            amount_n1 += 1
+        elseif level == "N2"
+            amount_n2 += 1
+        elseif level == "N3"
+            amount_n3 += 1
+        elseif level == "N4"
+            amount_n4 += 1
+        elseif level == "N5"
+            amount_n5 += 1
+        end
+    end
+write(joinpath(@__DIR__, "output", "result_$(i).txt"), "N1: $amount_n1\nN2: $amount_n2\nN3: $amount_n3\nN4: $amount_n4\nN5: $amount_n5")
+end
