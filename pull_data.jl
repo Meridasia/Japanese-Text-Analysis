@@ -28,15 +28,21 @@ function load_kanji_level(directory::String)
 end
 
 kanji_levels = load_kanji_level(base_dir)
+is_kanji(c::Char) =
+    c in ('\u3400':'\u4dbf') ||
+    c in ('\u4e00':'\u9fff') ||
+    c in ('\uf900':'\ufaff') ||
+    c in ('\U00020000':'\U0002a6df')
 
-
- get(kanji_levels, "一", "unbekannt")
+get(kanji_levels, "一", "unbekannt")
+is_kanji('一')  # true
 
 # read text files from input directory
 input_dir = joinpath(@__DIR__, "input")
 text = String[]
 name = String[]
 results = []
+unknown_kanji = Set{Char}()
 for file in sort(readdir(input_dir; join=true))
     push!(text, read(file, String))
     push!(name, splitext(basename(file))[1])
@@ -48,12 +54,21 @@ counts = Dict(
     "N2" => 0,
     "N3" => 0,
     "N4" => 0,
-    "N5" => 0
+    "N5" => 0,
+    "unknown" => 0,
 )
     for j in text[i]
-        level = get(kanji_levels, string(j), "");
-        if level !== ""
-            counts[level] += 1
+        if is_kanji(j)
+            level = get(kanji_levels, string(j), "");
+            if level !== ""
+                counts[level] += 1
+            else
+                counts["unknown"] += 1
+                if !in(j, unknown_kanji)
+                    push!(unknown_kanji, j)
+                end
+            end
+
         end
     end
     println("\nDatei ", name[i], ":")
@@ -62,14 +77,18 @@ counts = Dict(
     println("N3: ", counts["N3"])
     println("N4: ", counts["N4"])
     println("N5: ", counts["N5"])
-
+    println("Unbekannt: ", counts["unknown"])
+    println("Unbekannte Kanji: ", join(collect(unknown_kanji), ", "))
+    
     results_entry = Dict(
         "file" => name[i],
         "N1" => counts["N1"],
         "N2" => counts["N2"],
         "N3" => counts["N3"],
         "N4" => counts["N4"],
-        "N5" => counts["N5"]
+        "N5" => counts["N5"],
+        "unknown count" => counts["unknown"],
+        "unknown kanji" => join(collect(unknown_kanji), ", "),
     )
     push!(results, results_entry)
 end
