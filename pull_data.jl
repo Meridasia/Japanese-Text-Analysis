@@ -41,7 +41,17 @@ is_kanji('一')  # true
 input_dir = joinpath(@__DIR__, "input")
 text = String[]
 name = String[]
-results = []
+output_dir = joinpath(@__DIR__, "output")
+if !isdir(output_dir)
+    mkpath(output_dir)
+end
+if !isfile(joinpath(output_dir, "results.json"))
+    results = []
+else
+    results = JSON.parsefile(
+        joinpath(output_dir, "results.json")
+    )
+end
 unknown_kanji = Set{Char}()
 for file in sort(readdir(input_dir; join=true))
     push!(text, read(file, String))
@@ -57,6 +67,8 @@ counts = Dict(
     "N5" => 0,
     "unknown" => 0,
 )
+counts_percent = []
+unknown_kanji = Set{Char}()
     for j in text[i]
         if is_kanji(j)
             level = get(kanji_levels, string(j), "");
@@ -71,14 +83,21 @@ counts = Dict(
 
         end
     end
+total = sum(values(counts))
+levels = ["N1", "N2", "N3", "N4", "N5", "unknown"]
+for level in levels
+    push!(counts_percent, round(counts[level] / total * 100, digits=2))
+end
+
     println("\nDatei ", name[i], ":")
-    println("N1: ", counts["N1"])
-    println("N2: ", counts["N2"])
-    println("N3: ", counts["N3"])
-    println("N4: ", counts["N4"])
-    println("N5: ", counts["N5"])
-    println("Unbekannt: ", counts["unknown"])
+    println("N1: ", counts["N1"], " (", counts_percent[1], "%)")
+    println("N2: ", counts["N2"], " (", counts_percent[2], "%)")
+    println("N3: ", counts["N3"], " (", counts_percent[3], "%)")
+    println("N4: ", counts["N4"], " (", counts_percent[4], "%)")
+    println("N5: ", counts["N5"], " (", counts_percent[5], "%)")
+    println("Unbekannt: ", counts["unknown"], " (", counts_percent[6], "%)")
     println("Unbekannte Kanji: ", join(collect(unknown_kanji), ", "))
+    println("Gesamtanzahl der Kanji: ", total)
     
     results_entry = Dict(
         "file" => name[i],
@@ -87,9 +106,18 @@ counts = Dict(
         "N3" => counts["N3"],
         "N4" => counts["N4"],
         "N5" => counts["N5"],
+        "N1 percent" => counts_percent[1],
+        "N2 percent" => counts_percent[2],
+        "N3 percent" => counts_percent[3],
+        "N4 percent" => counts_percent[4],
+        "N5 percent" => counts_percent[5],
         "unknown count" => counts["unknown"],
+        "unknown percent" => counts_percent[6],
         "unknown kanji" => join(collect(unknown_kanji), ", "),
     )
     push!(results, results_entry)
 end
 
+open(joinpath(output_dir, "results.json"), "w") do file
+    JSON.print(file, results, 2)
+end
