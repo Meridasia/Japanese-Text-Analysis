@@ -55,10 +55,14 @@ end
 unknown_kanji = Set{Char}()
 for file in sort(readdir(input_dir; join=true))
     push!(text, read(file, String))
-    push!(name, splitext(basename(file))[1])
+    push!(name, basename(file))
 end
 
 for i in 1:length(text)
+    if results != [] && any(r -> r["file"] == name[i], results)
+        println("Datei ", name[i], " wurde bereits analysiert. Überspringe...")
+        continue
+    end
 counts = Dict(
     "N1" => 0,
     "N2" => 0,
@@ -84,10 +88,26 @@ unknown_kanji = Set{Char}()
         end
     end
 total = sum(values(counts))
-levels = ["N1", "N2", "N3", "N4", "N5", "unknown"]
+levels = ["N5", "N4", "N3", "N2", "N1", "unknown"]
+c = 0
+comfort = ""
+working = ""
+mastery = ""
 for level in levels
+    percent = round(counts[level] / total * 100, digits=2)
     push!(counts_percent, round(counts[level] / total * 100, digits=2))
+    c += percent
+    if c >= 75 && comfort == ""
+        comfort = level
+    end
+    if c >= 85 && working == ""
+            working = level
+    end
+    if c >= 95 && mastery == ""
+            mastery = level
+    end
 end
+
 
     println("\nDatei ", name[i], ":")
     println("N1: ", counts["N1"], " (", counts_percent[1], "%)")
@@ -98,7 +118,10 @@ end
     println("Unbekannt: ", counts["unknown"], " (", counts_percent[6], "%)")
     println("Unbekannte Kanji: ", join(collect(unknown_kanji), ", "))
     println("Gesamtanzahl der Kanji: ", total)
-    
+    println("Komfortlevel: ", comfort)
+    println("Arbeitslevel: ", working)
+    println("Meisterschaftlevel: ", mastery)
+
     results_entry = Dict(
         "file" => name[i],
         "N1" => counts["N1"],
@@ -114,6 +137,9 @@ end
         "unknown count" => counts["unknown"],
         "unknown percent" => counts_percent[6],
         "unknown kanji" => join(collect(unknown_kanji), ", "),
+        "comfort level" => comfort,
+        "working level" => working,
+        "mastery level" => mastery,
     )
     push!(results, results_entry)
 end
