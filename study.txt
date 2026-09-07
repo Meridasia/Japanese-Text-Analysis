@@ -1,0 +1,26 @@
+https://axogo.app/en/japanese/blog/kanji-needed-understand/
+
+    75% Comprehension: 1,568 kanjis and 3,986 words
+    85% Comprehension: 1,926 kanji and 6,255 words
+    95% Comprehension: 2,570 kanjis and 13,157 words
+
+What These Numbers Mean for You
+75% Comprehension: The Threshold of Comfort
+85% Comprehension: The Working Level
+95% Comprehension: Near-Native Mastery
+
+
+An examination of the utility of the Aozora Repository to support reading comprehension development, reading fluency, and extensive reading for L2 learners of Japanese
+https://www.sciencedirect.com/science/article/pii/S0346251X2400349X
+
+95% coverage rate of tokens in Japanese texts requires knowledge of 9500 words
+
+
+https://www.jstage.jst.go.jp/article/jmet/20/3/20_KJ00003905193/_article/-char/en/
+The 1,000 most frequently used kanji account for about 95% of the total kanji usage ; (2) 
+The 1,600 most frequently used kanji account for about 99% of the total, 
+while the nearly 3,000 remaining kanji only make up 1% of the total use
+
+https://www.researchgate.net/publication/265969060_Joyo_kanji_as_core_building_blocks_of_the_Japanese_writing_system_Some_observations_from_database_construction
+Jōyō kanji as core building blocks of the Japanese writing system: Some observations from database construction
+2,136 kanji

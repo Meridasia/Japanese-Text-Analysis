@@ -1,0 +1,14 @@
+number of kanji in each level:
+
+N5: 79
+N4: 166
+N3: 367
+N2: 367
+N1: 1232
+
+sum per level:
+N5: 79
+N4: 245
+N3: 613
+N2: 980
+N1: 2212
