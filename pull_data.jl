@@ -147,3 +147,104 @@ end
 open(joinpath(output_dir, "results.json"), "w") do file
     JSON.print(file, results, 2)
 end
+
+
+    count_comfort = Dict(
+    "N1" => 0,
+    "N2" => 0,
+    "N3" => 0,
+    "N4" => 0,
+    "N5" => 0,
+    "unknown" => 0,
+)
+  count_working = Dict(
+    "N1" => 0,
+    "N2" => 0,
+    "N3" => 0,
+    "N4" => 0,
+    "N5" => 0,
+    "unknown" => 0,
+)
+  count_mastery = Dict(
+    "N1" => 0,
+    "N2" => 0,
+    "N3" => 0,
+    "N4" => 0,
+    "N5" => 0,
+    "unknown" => 0,
+)
+
+for i in 1:length(results)
+    comfort = results[i]["comfort level"]
+    count_comfort[comfort] += 1
+    working = results[i]["working level"]
+    count_working[working] += 1
+    mastery = results[i]["mastery level"]
+    count_mastery[mastery] += 1
+end
+leng = length(results)
+levels = ["N5", "N4", "N3", "N2", "N1", "unknown"]
+totals = []
+total = []
+for level in levels
+    percent = round(count_comfort[level] / leng * 100, digits=2)
+    push!(totals, percent)
+    percent = round(count_working[level] / leng * 100, digits=2)
+    push!(totals, percent)
+    percent = round(count_mastery[level] / leng * 100, digits=2)
+    push!(totals, percent)
+end
+
+ totals_entry = Dict(
+        "category" => "comfort",
+        "N1" => count_comfort["N1"],
+        "N2" => count_comfort["N2"],
+        "N3" => count_comfort["N3"],
+        "N4" => count_comfort["N4"],
+        "N5" => count_comfort["N5"],
+        "unknown" => count_comfort["unknown"],
+        "N5 percent" => totals[1],
+        "N4 percent" => totals[4],
+        "N3 percent" => totals[7],
+        "N2 percent" => totals[10],
+        "N1 percent" => totals[13], 
+        "unknown percent" => totals[16]
+    )
+    push!(total, totals_entry)
+
+     totals_entry = Dict(
+        "category" => "working",
+        "N1" => count_working["N1"],
+        "N2" => count_working["N2"],
+        "N3" => count_working["N3"],
+        "N4" => count_working["N4"],
+        "N5" => count_working["N5"],
+        "unknown" => count_working["unknown"],
+        "N5 percent" => totals[2],
+        "N4 percent" => totals[5],
+        "N3 percent" => totals[8],
+        "N2 percent" => totals[11],
+        "N1 percent" => totals[14], 
+        "unknown percent" => totals[17]
+    )
+        push!(total, totals_entry)
+        totals_entry = Dict(
+        "category" => "mastery",
+        "N1" => count_mastery["N1"],
+        "N2" => count_mastery["N2"],
+        "N3" => count_mastery["N3"],
+        "N4" => count_mastery["N4"],
+        "N5" => count_mastery["N5"],
+        "unknown" => count_mastery["unknown"],
+        "N5 percent" => totals[3],
+        "N4 percent" => totals[6],
+        "N3 percent" => totals[9],
+        "N2 percent" => totals[12],
+        "N1 percent" => totals[15], 
+        "unknown percent" => totals[18]
+    )
+        push!(total, totals_entry)
+
+open(joinpath(output_dir, "total.json"), "w") do file
+JSON.print(file, total, 2)
+end
