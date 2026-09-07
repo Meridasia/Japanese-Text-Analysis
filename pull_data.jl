@@ -110,11 +110,11 @@ end
 
 
     println("\nDatei ", name[i], ":")
-    println("N1: ", counts["N1"], " (", counts_percent[1], "%)")
-    println("N2: ", counts["N2"], " (", counts_percent[2], "%)")
+    println("N5: ", counts["N5"], " (", counts_percent[1], "%)")
+    println("N4: ", counts["N4"], " (", counts_percent[2], "%)")
     println("N3: ", counts["N3"], " (", counts_percent[3], "%)")
-    println("N4: ", counts["N4"], " (", counts_percent[4], "%)")
-    println("N5: ", counts["N5"], " (", counts_percent[5], "%)")
+    println("N2: ", counts["N2"], " (", counts_percent[4], "%)")
+    println("N1: ", counts["N1"], " (", counts_percent[5], "%)")
     println("Unbekannt: ", counts["unknown"], " (", counts_percent[6], "%)")
     println("Unbekannte Kanji: ", join(collect(unknown_kanji), ", "))
     println("Gesamtanzahl der Kanji: ", total)
@@ -129,11 +129,11 @@ end
         "N3" => counts["N3"],
         "N4" => counts["N4"],
         "N5" => counts["N5"],
-        "N1 percent" => counts_percent[1],
-        "N2 percent" => counts_percent[2],
+        "N5 percent" => counts_percent[1],
+        "N4 percent" => counts_percent[2],
         "N3 percent" => counts_percent[3],
-        "N4 percent" => counts_percent[4],
-        "N5 percent" => counts_percent[5],
+        "N2 percent" => counts_percent[4],
+        "N1 percent" => counts_percent[5],
         "unknown count" => counts["unknown"],
         "unknown percent" => counts_percent[6],
         "unknown kanji" => join(collect(unknown_kanji), ", "),
