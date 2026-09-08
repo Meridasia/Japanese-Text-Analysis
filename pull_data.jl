@@ -1,5 +1,7 @@
 using JSON
+using Plots
 const LEVELS = ["N5", "N4", "N3", "N2", "N1", "unknown"]
+const TAGS = ["all", "ff", "nhk_news_easy", "nhk_news_normal"]
 const KANJI_DIR = joinpath(@__DIR__, "data", "json", "kanji")
 const INPUT_DIR = joinpath(@__DIR__, "input")
 const OUTPUT_DIR = joinpath(@__DIR__, "output")
@@ -64,7 +66,7 @@ function analyze(text, kanji_levels)
     result
 end
 
-function summarize(results)
+function summarize(results, tags)
     summary = Dict(category => Dict(level => 0 for level in LEVELS)
                    for category in ("comfort", "working", "mastery"))
     for result in results
@@ -77,11 +79,55 @@ function summarize(results)
 
     total_results = length(results)
     [Dict("category" => category,
+          "tag" => "total",
           (level => summary[category][level] for level in LEVELS)...,
           ("$(level) percent" => total_results == 0 ? 0.0 :
               round(summary[category][level] / total_results * 100, digits=2)
            for level in LEVELS)...)
      for category in ("comfort", "working", "mastery")]
+end
+
+function summarize2(results, tags)
+    tags = tags isa AbstractString ? [tags] : collect(tags)
+
+    isempty(tags) && (tags = ["all"])
+
+    summary = Dict(
+        tag => Dict(
+            category => Dict(level => 0 for level in LEVELS)
+            for category in ("comfort", "working", "mastery")
+        )
+        for tag in tags
+    )
+
+    for result in results
+        for tag in tags
+            if tag == "all" || occursin(tag, result["file"])
+                for (category, key) in (
+                    ("comfort", "comfort level"),
+                    ("working", "working level"),
+                    ("mastery", "mastery level")
+                )
+                    summary[tag][category][result[key]] += 1
+                end
+            end
+        end
+    end
+
+    [
+        Dict(
+            "category" => category,
+            "tag" => tag,
+            (level => summary[tag][category][level] for level in LEVELS)...,
+            ("$(level) percent" =>
+                total_results == 0 ? 0.0 :
+                round(summary[tag][category][level] / total_results * 100, digits=2)
+             for level in LEVELS)...
+        )
+        for tag in tags
+        for category in ("comfort", "working", "mastery")
+        for total_results in [sum(values(summary[tag][category]))]
+    ]
 end
 
 mkpath(OUTPUT_DIR)
@@ -106,5 +152,44 @@ open(RESULTS_FILE, "w") do file
 end
 
 open(joinpath(OUTPUT_DIR, "total.json"), "w") do file
-    JSON.print(file, summarize(results), 2)
+    JSON.print(file, summarize2(results, TAGS), 2)
 end
+
+function plot_total(data_file, output_file)
+    data = JSON.parsefile(data_file)
+    categories = ("comfort", "working", "mastery")
+    x_labels = LEVELS
+    tag_data = Dict(
+        category => Dict(
+            record["tag"] => [record["$(level) percent"] for level in x_labels]
+            for record in data if record["category"] == category
+        )
+        for category in categories
+    )
+
+    graphs = map(categories) do category
+        tags = sort!(collect(keys(tag_data[category])))
+        isempty(tags) && error("No data found for category: $category")
+
+        graph = plot(
+            x_labels,
+            tag_data[category][tags[1]];
+            title = titlecase(category),
+            xlabel = "JLPT level",
+            ylabel = "Percentage",
+            ylims = (0, 100),
+            label = tags[1],
+            marker = :circle
+        )
+        for tag in tags[2:end]
+            plot!(graph, x_labels, tag_data[category][tag]; label = tag, marker = :circle)
+        end
+        graph
+    end
+
+    comparison = plot(graphs...; layout = (1, 3), size = (1500, 500), link = :y)
+    savefig(comparison, output_file)
+    comparison
+end
+
+plot_total(joinpath(OUTPUT_DIR, "total.json"), joinpath(OUTPUT_DIR, "comparison.png"))
