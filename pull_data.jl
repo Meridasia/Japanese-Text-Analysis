@@ -1,250 +1,110 @@
-using Pkg
-Pkg.add("JSON")
 using JSON
-path = joinpath(@__DIR__, "data", "json", "kanji", "n5.json")
-data = JSON.parsefile(path) # liest die JSON-Datei und gibt ein Array von Dictionaries zurück
+const LEVELS = ["N5", "N4", "N3", "N2", "N1", "unknown"]
+const KANJI_DIR = joinpath(@__DIR__, "data", "json", "kanji")
+const INPUT_DIR = joinpath(@__DIR__, "input")
+const OUTPUT_DIR = joinpath(@__DIR__, "output")
+const RESULTS_FILE = joinpath(OUTPUT_DIR, "results.json")
 
-println(data[1])   # first entry
-println(keys(data[1]))  # field names
-println(data[1]["character"])  # first kanji character
-println(data[1]["level"])  # level of the first kanji character
-
-using JSON
-
-base_dir = joinpath(@__DIR__, "data", "json", "kanji")
-
-function load_kanji_level(directory::String)
-    kanji_levels = Dict{String, String}()
-
-    for file in readdir(directory; join=true)
-        data = JSON.parsefile(file)
-
-        for entry in data
-            kanji_levels[entry["character"]] = entry["level"]
-        end
+function load_kanji_levels(directory)
+    levels = Dict{String, String}()
+    for file in readdir(directory; join=true), entry in JSON.parsefile(file)
+        levels[entry["character"]] = entry["level"]
     end
-
-    return kanji_levels
+    levels
 end
 
-kanji_levels = load_kanji_level(base_dir)
 is_kanji(c::Char) =
     c in ('\u3400':'\u4dbf') ||
     c in ('\u4e00':'\u9fff') ||
     c in ('\uf900':'\ufaff') ||
     c in ('\U00020000':'\U0002a6df')
 
-get(kanji_levels, "一", "unbekannt")
-is_kanji('一')  # true
-
-# read text files from input directory
-input_dir = joinpath(@__DIR__, "input")
-text = String[]
-name = String[]
-output_dir = joinpath(@__DIR__, "output")
-if !isdir(output_dir)
-    mkpath(output_dir)
-end
-if !isfile(joinpath(output_dir, "results.json"))
-    results = []
-else
-    results = JSON.parsefile(
-        joinpath(output_dir, "results.json")
-    )
-end
-unknown_kanji = Set{Char}()
-for file in sort(readdir(input_dir; join=true))
-    push!(text, read(file, String))
-    push!(name, basename(file))
-end
-
-for i in 1:length(text)
-    if results != [] && any(r -> r["file"] == name[i], results)
-        println("Datei ", name[i], " wurde bereits analysiert. Überspringe...")
-        continue
+function analyze(text, kanji_levels)
+    counts = Dict(level => 0 for level in LEVELS)
+    unknown = Set{Char}()
+    for character in text
+        is_kanji(character) || continue
+        level = get(kanji_levels, string(character), "unknown")
+        counts[level] += 1
+        level == "unknown" && push!(unknown, character)
     end
-counts = Dict(
-    "N1" => 0,
-    "N2" => 0,
-    "N3" => 0,
-    "N4" => 0,
-    "N5" => 0,
-    "unknown" => 0,
-)
-counts_percent = []
-unknown_kanji = Set{Char}()
-    for j in text[i]
-        if is_kanji(j)
-            level = get(kanji_levels, string(j), "");
-            if level !== ""
-                counts[level] += 1
-            else
-                counts["unknown"] += 1
-                if !in(j, unknown_kanji)
-                    push!(unknown_kanji, j)
-                end
-            end
 
+    total = sum(values(counts))
+    percentages = Dict(level => total == 0 ? 0.0 : round(counts[level] / total * 100, digits=2) # ? means then; : means else; if total 0 then % 0 else calculate %
+                       for level in LEVELS)
+    cumulative = 0.0
+    threshold_levels = Dict(75 => "", 85 => "", 95 => "")
+    for level in LEVELS
+        cumulative += percentages[level]
+        for threshold in keys(threshold_levels)
+            cumulative >= threshold && threshold_levels[threshold] == "" &&
+                (threshold_levels[threshold] = level)
         end
     end
-total = sum(values(counts))
-levels = ["N5", "N4", "N3", "N2", "N1", "unknown"]
-c = 0
-comfort = ""
-working = ""
-mastery = ""
-for level in levels
-    percent = round(counts[level] / total * 100, digits=2)
-    push!(counts_percent, round(counts[level] / total * 100, digits=2))
-    c += percent
-    if c >= 75 && comfort == ""
-        comfort = level
-    end
-    if c >= 85 && working == ""
-            working = level
-    end
-    if c >= 95 && mastery == ""
-            mastery = level
-    end
-end
 
-
-    println("\nDatei ", name[i], ":")
-    println("N5: ", counts["N5"], " (", counts_percent[1], "%)")
-    println("N4: ", counts["N4"], " (", counts_percent[2], "%)")
-    println("N3: ", counts["N3"], " (", counts_percent[3], "%)")
-    println("N2: ", counts["N2"], " (", counts_percent[4], "%)")
-    println("N1: ", counts["N1"], " (", counts_percent[5], "%)")
-    println("Unbekannt: ", counts["unknown"], " (", counts_percent[6], "%)")
-    println("Unbekannte Kanji: ", join(collect(unknown_kanji), ", "))
-    println("Gesamtanzahl der Kanji: ", total)
-    println("Komfortlevel: ", comfort)
-    println("Arbeitslevel: ", working)
-    println("Meisterschaftlevel: ", mastery)
-
-    results_entry = Dict(
-        "file" => name[i],
-        "N1" => counts["N1"],
-        "N2" => counts["N2"],
-        "N3" => counts["N3"],
-        "N4" => counts["N4"],
-        "N5" => counts["N5"],
-        "N5 percent" => counts_percent[1],
-        "N4 percent" => counts_percent[2],
-        "N3 percent" => counts_percent[3],
-        "N2 percent" => counts_percent[4],
-        "N1 percent" => counts_percent[5],
-        "unknown count" => counts["unknown"],
-        "unknown percent" => counts_percent[6],
-        "unknown kanji" => join(collect(unknown_kanji), ", "),
-        "comfort level" => comfort,
-        "working level" => working,
-        "mastery level" => mastery,
+    result = Dict{String, Any}(
+        "N1" => counts["N1"], "N2" => counts["N2"], "N3" => counts["N3"],
+        "N4" => counts["N4"], "N5" => counts["N5"],
+        "N1 percent" => percentages["N1"], "N2 percent" => percentages["N2"],
+        "N3 percent" => percentages["N3"], "N4 percent" => percentages["N4"],
+        "N5 percent" => percentages["N5"], "unknown count" => counts["unknown"],
+        "unknown percent" => percentages["unknown"],
+        "unknown kanji" => join(sort!(collect(unknown)), ", "),
+        "comfort level" => threshold_levels[75],
+        "working level" => threshold_levels[85],
+        "mastery level" => threshold_levels[95],
     )
-    push!(results, results_entry)
+    println("N1-N5: ", [counts[level] for level in reverse(LEVELS[1:5])])
+    println("Unbekannt: ", counts["unknown"], " (", percentages["unknown"], "%)")
+    println("Unbekannte Kanji: ", result["unknown kanji"])
+    println("Gesamtanzahl der Kanji: ", total)
+    println("Komfortlevel: ", result["comfort level"])
+    println("Arbeitslevel: ", result["working level"])
+    println("Meisterschaftlevel: ", result["mastery level"])
+    result
 end
 
-open(joinpath(output_dir, "results.json"), "w") do file
+function summarize(results)
+    summary = Dict(category => Dict(level => 0 for level in LEVELS)
+                   for category in ("comfort", "working", "mastery"))
+    for result in results
+        for (category, key) in (("comfort", "comfort level"),
+                                ("working", "working level"),
+                                ("mastery", "mastery level"))
+            summary[category][result[key]] += 1
+        end
+    end
+
+    total_results = length(results)
+    [Dict("category" => category,
+          (level => summary[category][level] for level in LEVELS)...,
+          ("$(level) percent" => total_results == 0 ? 0.0 :
+              round(summary[category][level] / total_results * 100, digits=2)
+           for level in LEVELS)...)
+     for category in ("comfort", "working", "mastery")]
+end
+
+mkpath(OUTPUT_DIR)
+results = isfile(RESULTS_FILE) ? JSON.parsefile(RESULTS_FILE) : Any[]
+known_files = Set(result["file"] for result in results)
+kanji_levels = load_kanji_levels(KANJI_DIR)
+
+for file in sort(readdir(INPUT_DIR; join=true))
+    filename = basename(file)
+    if filename in known_files
+        println("Datei ", filename, " wurde bereits analysiert. Überspringe...")
+        continue
+    end
+    println("\nDatei ", filename, ":")
+    result = analyze(read(file, String), kanji_levels)
+    result["file"] = filename
+    push!(results, result)
+end
+
+open(RESULTS_FILE, "w") do file
     JSON.print(file, results, 2)
 end
 
-
-    count_comfort = Dict(
-    "N1" => 0,
-    "N2" => 0,
-    "N3" => 0,
-    "N4" => 0,
-    "N5" => 0,
-    "unknown" => 0,
-)
-  count_working = Dict(
-    "N1" => 0,
-    "N2" => 0,
-    "N3" => 0,
-    "N4" => 0,
-    "N5" => 0,
-    "unknown" => 0,
-)
-  count_mastery = Dict(
-    "N1" => 0,
-    "N2" => 0,
-    "N3" => 0,
-    "N4" => 0,
-    "N5" => 0,
-    "unknown" => 0,
-)
-
-for i in 1:length(results)
-    comfort = results[i]["comfort level"]
-    count_comfort[comfort] += 1
-    working = results[i]["working level"]
-    count_working[working] += 1
-    mastery = results[i]["mastery level"]
-    count_mastery[mastery] += 1
-end
-leng = length(results)
-levels = ["N5", "N4", "N3", "N2", "N1", "unknown"]
-totals = []
-total = []
-for level in levels
-    percent = round(count_comfort[level] / leng * 100, digits=2)
-    push!(totals, percent)
-    percent = round(count_working[level] / leng * 100, digits=2)
-    push!(totals, percent)
-    percent = round(count_mastery[level] / leng * 100, digits=2)
-    push!(totals, percent)
-end
-
- totals_entry = Dict(
-        "category" => "comfort",
-        "N1" => count_comfort["N1"],
-        "N2" => count_comfort["N2"],
-        "N3" => count_comfort["N3"],
-        "N4" => count_comfort["N4"],
-        "N5" => count_comfort["N5"],
-        "unknown" => count_comfort["unknown"],
-        "N5 percent" => totals[1],
-        "N4 percent" => totals[4],
-        "N3 percent" => totals[7],
-        "N2 percent" => totals[10],
-        "N1 percent" => totals[13], 
-        "unknown percent" => totals[16]
-    )
-    push!(total, totals_entry)
-
-     totals_entry = Dict(
-        "category" => "working",
-        "N1" => count_working["N1"],
-        "N2" => count_working["N2"],
-        "N3" => count_working["N3"],
-        "N4" => count_working["N4"],
-        "N5" => count_working["N5"],
-        "unknown" => count_working["unknown"],
-        "N5 percent" => totals[2],
-        "N4 percent" => totals[5],
-        "N3 percent" => totals[8],
-        "N2 percent" => totals[11],
-        "N1 percent" => totals[14], 
-        "unknown percent" => totals[17]
-    )
-        push!(total, totals_entry)
-        totals_entry = Dict(
-        "category" => "mastery",
-        "N1" => count_mastery["N1"],
-        "N2" => count_mastery["N2"],
-        "N3" => count_mastery["N3"],
-        "N4" => count_mastery["N4"],
-        "N5" => count_mastery["N5"],
-        "unknown" => count_mastery["unknown"],
-        "N5 percent" => totals[3],
-        "N4 percent" => totals[6],
-        "N3 percent" => totals[9],
-        "N2 percent" => totals[12],
-        "N1 percent" => totals[15], 
-        "unknown percent" => totals[18]
-    )
-        push!(total, totals_entry)
-
-open(joinpath(output_dir, "total.json"), "w") do file
-JSON.print(file, total, 2)
+open(joinpath(OUTPUT_DIR, "total.json"), "w") do file
+    JSON.print(file, summarize(results), 2)
 end

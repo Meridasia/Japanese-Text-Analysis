@@ -14,7 +14,7 @@
     "file": "ff_chatGPT_01.txt",
     "mastery level": "unknown",
     "unknown count": 169,
-    "unknown kanji": "丈, 俺, 僅, 分, 可, 叱, 吊, 呆, 呟, 咳, 喉, 嘲, 囁, 拭, 掠, 掴, 撫, 昧, 晒, 曖, 溺, 濡, 無, 狼, 瓦, 的, 礫, 繋, 膝, 臆, 蘇, 覗, 誰, 蹴, 身, 闇, 頃, 頬",
+    "unknown kanji": "嘲, 臆, 頃, 無, 丈, 分, 囁, 掴, 礫, 掠, 繋, 曖, 昧, 溺, 誰, 俺, 闇, 呟, 的, 濡, 吊, 覗, 叱, 拭, 僅, 頬, 咳, 蹴, 呆, 撫, 晒, 喉, 身, 狼, 蘇, 瓦, 可, 膝",
     "unknown percent": 6.74,
     "working level": "N1"
   },
@@ -33,7 +33,7 @@
     "file": "ff_chatGPT_02.txt",
     "mastery level": "unknown",
     "unknown count": 114,
-    "unknown kanji": "丈, 俺, 分, 叩, 呆, 呟, 咳, 堵, 妬, 嫉, 揉, 撫, 梳, 椅, 無, 的, 繋, 羨, 膝, 誰, 身, 鎧, 頃",
+    "unknown kanji": "嫉, 頃, 無, 丈, 分, 繋, 妬, 俺, 誰, 呟, 的, 叩, 椅, 羨, 咳, 呆, 堵, 撫, 鎧, 身, 膝, 揉, 梳",
     "unknown percent": 7.18,
     "working level": "N1"
   },
@@ -356,7 +356,7 @@
     "file": "nhk_news_normal_202609071540.txt",
     "mastery level": "N1",
     "unknown count": 2,
-    "unknown kanji": "可, 脇",
+    "unknown kanji": "脇, 可",
     "unknown percent": 1.0,
     "working level": "N1"
   },
@@ -394,7 +394,7 @@
     "file": "nhk_news_normal_202609071912.txt",
     "mastery level": "N1",
     "unknown count": 17,
-    "unknown kanji": "丈, 分, 可, 崖, 氾, 畿, 的",
+    "unknown kanji": "崖, 丈, 分, 畿, 的, 可, 氾",
     "unknown percent": 2.37,
     "working level": "N2"
   },
@@ -432,7 +432,7 @@
     "file": "nhk_news_normal_202609071930.txt",
     "mastery level": "N1",
     "unknown count": 16,
-    "unknown kanji": "分, 可, 塞, 無, 的, 脇, 里",
+    "unknown kanji": "塞, 脇, 分, 可, 無, 的, 里",
     "unknown percent": 1.82,
     "working level": "N2"
   },
@@ -451,7 +451,7 @@
     "file": "nhk_news_normal_202609071941.txt",
     "mastery level": "N1",
     "unknown count": 17,
-    "unknown kanji": "分, 可, 桁, 的, 茨, 諏, 身, 邉",
+    "unknown kanji": "桁, 分, 可, 的, 身, 茨, 諏, 邉",
     "unknown percent": 1.59,
     "working level": "N2"
   },
