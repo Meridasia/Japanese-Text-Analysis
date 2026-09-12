@@ -1,0 +1,10 @@
+# Julia environments and local machine files
+Manifest.toml
+.DS_Store
+
+# Generated analysis output
+output/results.json
+output/results_old.json
+output/total.json
+output/comparison.png
+output/result_*.txt
