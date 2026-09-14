@@ -31,7 +31,7 @@ end
 @testset "summaries" begin
     results = [
         Dict{String, Any}(
-            "file" => "ff_chatGPT.txt",
+            "file" => "ff_ao3.txt",
             "comfort level" => "N5",
             "working level" => "N2",
             "mastery level" => "unknown",

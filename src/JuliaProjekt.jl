@@ -7,7 +7,7 @@ export LEVELS, TAGS, is_kanji, load_kanji_levels, analyze, summarize, summarize2
     run_analysis, plot_total
 
 const LEVELS = ["N5", "N4", "N3", "N2", "N1", "unknown"]
-const TAGS = ["all", "ff", "nhk_news_easy", "nhk_news_normal"]
+const TAGS = ["all", "ff", "news"] # declare own tags here
 
 """Load a character-to-level lookup table from all JSON files in `directory`."""
 function load_kanji_levels(directory::AbstractString)

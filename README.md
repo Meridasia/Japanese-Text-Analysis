@@ -57,6 +57,13 @@ input/                Text files to analyze
 output/               Generated results
 ```
 
-## License
+## Licensing
 
-This project is released under the MIT License. See `LICENSE`.
+The JuliaProjekt source code is licensed under the MIT License.
+
+The JLPT data in `data/` is derived from
+[OpenJLPT](https://github.com/evanclan/OpenJLPT), licensed under
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+
+The data has been adapted for use by JuliaProjekt. Derivative versions of
+that data must remain available under CC BY-SA 4.0.
