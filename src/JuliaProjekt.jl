@@ -22,10 +22,11 @@ end
 
 """Return whether `character` belongs to one of the common CJK ideograph blocks."""
 is_kanji(character::Char) =
-    character in ('\u3400':'\u4dbf') ||
-    character in ('\u4e00':'\u9fff') ||
-    character in ('\uf900':'\ufaff') ||
-    character in ('\U00020000':'\U0002a6df')
+    character in ('\u3400':'\u4dbf') || #CJK Unified Ideographs Extension A
+    character in ('\u4e00':'\u9fff') || #CJK Unified Ideographs
+    character in ('\uf900':'\ufaff') || #CJK Compatibility Ideographs
+    character in ('\U00020000':'\U0002a6df') #CJK Unified Ideographs Extension B
+    # further extensions exist, but are rarely used in modern Japanese
 
 """Analyze kanji coverage in `text` using a character-to-level lookup table."""
 function analyze(text::AbstractString, kanji_levels::AbstractDict)
