@@ -31,6 +31,7 @@ println(result["working level"])
 The main public functions are:
 
 - `load_kanji_levels(directory)` loads the JLPT lookup table.
+- `is_kanji(character)` checks whether a character belongs to a common CJK ideograph block.
 - `analyze(text, kanji_levels)` calculates counts, percentages, and coverage thresholds.
 - `summarize(results, tags)` summarizes files selected by filename tags.
 - `run_analysis(input_dir, kanji_dir, output_dir)` processes new input files and writes JSON output.

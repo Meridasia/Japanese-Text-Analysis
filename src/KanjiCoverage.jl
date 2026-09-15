@@ -30,11 +30,11 @@ is_kanji(character::Char) =
 
 """Analyze kanji coverage in `text` using a character-to-level lookup table."""
 function analyze(text::AbstractString, kanji_levels::AbstractDict)
-    counts = Dict(level => 0 for level in LEVELS)
+    counts = Dict(level => 0 for level in LEVELS)  # {"N5"=>0, "N4"=>0, ..., "unknown"=>0}
     unknown = Set{Char}()
 
     for character in text
-        is_kanji(character) || continue
+        is_kanji(character) || continue   # skip non-kanji characters
         level = get(kanji_levels, string(character), "unknown")
         counts[level] += 1
         level == "unknown" && push!(unknown, character)
