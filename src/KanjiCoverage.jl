@@ -1,9 +1,9 @@
-module JuliaProjekt
+module KanjiCoverage
 
 using JSON
 using Plots
 
-export LEVELS, TAGS, is_kanji, load_kanji_levels, analyze, summarize, summarize2,
+export LEVELS, TAGS, is_kanji, load_kanji_levels, analyze, summarize,
     run_analysis, plot_total
 
 const LEVELS = ["N5", "N4", "N3", "N2", "N1", "unknown"]
@@ -138,12 +138,12 @@ function run_analysis(
         JSON.print(file, results, 2)
     end
     open(joinpath(output_dir, "total.json"), "w") do file
-        JSON.print(file, summarize2(results, tags), 2)
+        JSON.print(file, summarize(results, tags), 2)
     end
     results
 end
 
-"""Create a three-panel comparison plot from a `summarize2` JSON file."""
+"""Create a three-panel comparison plot from a `summarize` JSON file."""
 function plot_total(data_file::AbstractString, output_file::AbstractString)
     data = JSON.parsefile(data_file)
     categories = ("comfort", "working", "mastery")

@@ -1,6 +1,6 @@
-# JuliaProjekt
+# KanjiCoverage
 
-JuliaProjekt measures Japanese kanji coverage in text using JLPT levels N5 through N1. It can analyze text files, report comprehension thresholds, group results by filename tags, and create comparison plots.
+KanjiCoverage measures Japanese kanji coverage in text using JLPT levels N5 through N1. It can analyze text files, report comprehension thresholds, group results by filename tags, and create comparison plots.
 
 ## Requirements
 
@@ -21,7 +21,7 @@ Pkg.test()
 ## Use as a package
 
 ```julia
-using JuliaProjekt
+using KanjiCoverage
 
 levels = load_kanji_levels("data/json/kanji")
 result = analyze("日本語を勉強します。", levels)
@@ -39,7 +39,7 @@ The main public functions are:
 ## Run the included data pipeline
 
 ```julia
-using JuliaProjekt
+using KanjiCoverage
 
 run_analysis("input", "data/json/kanji", "output")
 plot_total("output/total.json", "output/comparison.png")
@@ -50,20 +50,20 @@ plot_total("output/total.json", "output/comparison.png")
 ## Project layout
 
 ```text
-src/JuliaProjekt.jl   Package implementation
+src/KanjiCoverage.jl  Package implementation
 test/runtests.jl      Automated tests
-data/                 JLPT kanji data
+data/json/kanji       JLPT kanji data
 input/                Text files to analyze
 output/               Generated results
 ```
 
 ## Licensing
 
-The JuliaProjekt source code is licensed under the MIT License.
+The KanjiCoverage source code is licensed under the MIT License.
 
 The JLPT data in `data/` is derived from
 [OpenJLPT](https://github.com/evanclan/OpenJLPT), licensed under
 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
-The data has been adapted for use by JuliaProjekt. Derivative versions of
+The data has been adapted for use by KanjiCoverage. Derivative versions of
 that data must remain available under CC BY-SA 4.0.

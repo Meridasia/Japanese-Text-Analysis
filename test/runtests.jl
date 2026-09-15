@@ -1,5 +1,5 @@
 using Test
-using JuliaProjekt
+using KanjiCoverage
 
 @testset "kanji detection" begin
     @test is_kanji('日')

@@ -1,7 +1,0 @@
-# package struktur
-# dokumentation
-# tests
-# lizenz
-# (trebuchet als beispiel)
-# optionale features/ issues: unknown kanji in JLPT stufen einordnen
-# vortrag vorbereiten

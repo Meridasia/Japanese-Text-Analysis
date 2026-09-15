@@ -1,8 +1,8 @@
-name = "JuliaProjekt"
+name = "KanjiCoverage"
 uuid = "8c7d3e5a-2e8b-4e7d-9c8f-2a6d7b4f1e30"
 version = "0.1.0"
 
-authors = ["JuliaProjekt contributors"]
+authors = ["Meridasia"]
 
 [deps]
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
