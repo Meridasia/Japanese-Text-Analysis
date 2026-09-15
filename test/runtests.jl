@@ -5,6 +5,7 @@ using KanjiCoverage
     @test is_kanji('日')
     @test is_kanji('𠀀')
     @test !is_kanji('A')
+    @test !is_kanji('.')
 end
 
 @testset "kanji analysis" begin

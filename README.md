@@ -25,7 +25,7 @@ using KanjiCoverage
 
 levels = load_kanji_levels("data/json/kanji")
 result = analyze("日本語を勉強します。", levels)
-println(result["unknown kanji"])
+println(result["working level"])
 ```
 
 The main public functions are:
